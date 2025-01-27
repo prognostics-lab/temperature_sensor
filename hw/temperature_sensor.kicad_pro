@@ -58,7 +58,9 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        "courtyards_overlap|149856000|95949000|df539175-ff05-4711-8394-caae89bb969b|ea6d29c8-e79e-4b25-884b-841846544142"
+      ],
       "meta": {
         "version": 2
       },
@@ -482,7 +484,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "fab/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
