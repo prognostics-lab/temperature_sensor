@@ -46,6 +46,8 @@ void loop() {
       Serial.print(temperature, 2);
       Serial.print(",");
       Serial.println(sensors.getTempCByIndex(0));
+    } else if (command == "*IDN?") {
+        Serial.println("ROSATECH,TSN100,P0000002,1.0.1");
     }
   }
 
