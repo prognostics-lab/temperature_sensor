@@ -58,6 +58,7 @@ void loop() {
         Serial.print(temperature, 2);
 
         faults[i] = max31865[i].readFault();
+        max31865[i].clearFault();
       }
 
       // Send faults to row
@@ -74,35 +75,34 @@ void loop() {
       Serial.println("");
 
       // Send parseable faults
-      for (int i = 0; i < max31865_total; i++) {
-        uint8_t fault = faults[i];
-        if (fault) {
-          Serial.print("; Fault @D");
-          Serial.print(MAX31865_CS_PIN_START + i);
-          Serial.print(" 0b");
-          Serial.println(fault, BIN);
+      // for (int i = 0; i < max31865_total; i++) {
+      //   uint8_t fault = faults[i];
+      //   if (fault) {
+      //     Serial.print("; Fault @D");
+      //     Serial.print(MAX31865_CS_PIN_START + i);
+      //     Serial.print(" 0b");
+      //     Serial.println(fault, BIN);
 
-          if (fault & MAX31865_FAULT_HIGHTHRESH) {
-            Serial.println("; RTD High Threshold");
-          }
-          if (fault & MAX31865_FAULT_LOWTHRESH) {
-            Serial.println("; RTD Low Threshold");
-          }
-          if (fault & MAX31865_FAULT_REFINLOW) {
-            Serial.println("; REFIN- > 0.85 x Bias");
-          }
-          if (fault & MAX31865_FAULT_REFINHIGH) {
-            Serial.println("; REFIN- < 0.85 x Bias - FORCE- open");
-          }
-          if (fault & MAX31865_FAULT_RTDINLOW) {
-            Serial.println("; RTDIN- < 0.85 x Bias - FORCE- open");
-          }
-          if (fault & MAX31865_FAULT_OVUV) {
-            Serial.println("; Under/Over voltage");
-          }
-          max31865[i].clearFault();
-        }
-    }
+      //     if (fault & MAX31865_FAULT_HIGHTHRESH) {
+      //       Serial.println("; RTD High Threshold");
+      //     }
+      //     if (fault & MAX31865_FAULT_LOWTHRESH) {
+      //       Serial.println("; RTD Low Threshold");
+      //     }
+      //     if (fault & MAX31865_FAULT_REFINLOW) {
+      //       Serial.println("; REFIN- > 0.85 x Bias");
+      //     }
+      //     if (fault & MAX31865_FAULT_REFINHIGH) {
+      //       Serial.println("; REFIN- < 0.85 x Bias - FORCE- open");
+      //     }
+      //     if (fault & MAX31865_FAULT_RTDINLOW) {
+      //       Serial.println("; RTDIN- < 0.85 x Bias - FORCE- open");
+      //     }
+      //     if (fault & MAX31865_FAULT_OVUV) {
+      //       Serial.println("; Under/Over voltage");
+      //     }
+      //   }
+      // }
 
       // Clear buffer after processing
       commandBuffer = "";
