@@ -28,14 +28,14 @@ void setup() {
     pinMode(MAX31865_CS_PIN_START + i, OUTPUT);
   }
 
-  Serial.println("=== Initializing ADCs ===");
+  Serial.println("; === Initializing ADCs ===");
   for (int i = 0; i < max31865_total; i++) {
     max31865[i].begin(MAX31865_3WIRE);
-    Serial.print("Initialized on port D");
+    Serial.print("; Initialized on port D");
     Serial.println(MAX31865_CS_PIN_START + i);
   }
 
-  Serial.println("Rock and stone!");
+  Serial.println("; Rock and stone!");
 }
 
 void loop() {
@@ -59,38 +59,50 @@ void loop() {
 
         faults[i] = max31865[i].readFault();
       }
-      Serial.println("");
 
-      // Check for faults
+      // Send faults to row
       for (int i = 0; i < max31865_total; i++) {
           uint8_t fault = faults[i];
+          Serial.print(",");
           if (fault) {
-            Serial.print("Fault @D");
+            Serial.print("D");
             Serial.print(MAX31865_CS_PIN_START + i);
-            Serial.print(" 0x");
-            Serial.println(fault, HEX);
-
-            if (fault & MAX31865_FAULT_HIGHTHRESH) {
-              Serial.println("RTD High Threshold");
-            }
-            if (fault & MAX31865_FAULT_LOWTHRESH) {
-              Serial.println("RTD Low Threshold");
-            }
-            if (fault & MAX31865_FAULT_REFINLOW) {
-              Serial.println("REFIN- > 0.85 x Bias");
-            }
-            if (fault & MAX31865_FAULT_REFINHIGH) {
-              Serial.println("REFIN- < 0.85 x Bias - FORCE- open");
-            }
-            if (fault & MAX31865_FAULT_RTDINLOW) {
-              Serial.println("RTDIN- < 0.85 x Bias - FORCE- open");
-            }
-            if (fault & MAX31865_FAULT_OVUV) {
-              Serial.println("Under/Over voltage");
-            }
-            max31865[i].clearFault();
+            Serial.print("b");
+            Serial.print(fault, BIN);
           }
       }
+      Serial.println("");
+
+      // Send parseable faults
+      for (int i = 0; i < max31865_total; i++) {
+        uint8_t fault = faults[i];
+        if (fault) {
+          Serial.print("; Fault @D");
+          Serial.print(MAX31865_CS_PIN_START + i);
+          Serial.print(" 0b");
+          Serial.println(fault, BIN);
+
+          if (fault & MAX31865_FAULT_HIGHTHRESH) {
+            Serial.println("; RTD High Threshold");
+          }
+          if (fault & MAX31865_FAULT_LOWTHRESH) {
+            Serial.println("; RTD Low Threshold");
+          }
+          if (fault & MAX31865_FAULT_REFINLOW) {
+            Serial.println("; REFIN- > 0.85 x Bias");
+          }
+          if (fault & MAX31865_FAULT_REFINHIGH) {
+            Serial.println("; REFIN- < 0.85 x Bias - FORCE- open");
+          }
+          if (fault & MAX31865_FAULT_RTDINLOW) {
+            Serial.println("; RTDIN- < 0.85 x Bias - FORCE- open");
+          }
+          if (fault & MAX31865_FAULT_OVUV) {
+            Serial.println("; Under/Over voltage");
+          }
+          max31865[i].clearFault();
+        }
+    }
 
       // Clear buffer after processing
       commandBuffer = "";
