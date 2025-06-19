@@ -1,11 +1,14 @@
 #include <SPI.h>
 #include <Adafruit_MAX31865.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 // ADC pins D2-D5
 #define MAX31865_TOTAL 4          // Total number of sensors
 #define MAX31865_CS_PIN_START 2   // First CS pin
 #define RTD_NOMINAL 100.0         // PT100
 #define RREF 430.0                // Reference resistor
+#define ONE_WIRE_BUS 10           // Bus for Dallas sensors
 
 Adafruit_MAX31865 max31865[MAX31865_TOTAL] = {
   Adafruit_MAX31865(MAX31865_CS_PIN_START + 0, 11, 12, 13),
@@ -13,6 +16,8 @@ Adafruit_MAX31865 max31865[MAX31865_TOTAL] = {
   Adafruit_MAX31865(MAX31865_CS_PIN_START + 2, 11, 12, 13),
   Adafruit_MAX31865(MAX31865_CS_PIN_START + 3, 11, 12, 13),
 };
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
 
 uint8_t faults[MAX31865_TOTAL] = {0};
 
@@ -35,7 +40,10 @@ void setup() {
     Serial.println(MAX31865_CS_PIN_START + i);
   }
 
-  Serial.println("; Rock and stone!");
+  Serial.println("; === Initializing Dallas sensors ===");
+  sensors.begin();
+
+  Serial.println("; === Rock and stone! ===");
 }
 
 void loop() {
@@ -63,14 +71,21 @@ void loop() {
 
       // Send faults to row
       for (int i = 0; i < max31865_total; i++) {
-          uint8_t fault = faults[i];
+        uint8_t fault = faults[i];
+        Serial.print(",");
+        if (fault) {
+          Serial.print("D");
+          Serial.print(MAX31865_CS_PIN_START + i);
+          Serial.print("b");
+          Serial.print(fault, BIN);
+        }
+      }
+
+      // Send ambient temperatures
+      sensors.requestTemperatures();
+      for (int i = 0; i < sensors.getDeviceCount(); i++) {
           Serial.print(",");
-          if (fault) {
-            Serial.print("D");
-            Serial.print(MAX31865_CS_PIN_START + i);
-            Serial.print("b");
-            Serial.print(fault, BIN);
-          }
+          Serial.print(sensors.getTempCByIndex(i));
       }
       Serial.println("");
 
